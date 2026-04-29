@@ -62,62 +62,62 @@
 <div class="container">
   <div id="page-cover" class="page cover active">
     <h1>六爻卜卦</h1>
-    <div class="sub">文王圣卦 · 纳甲筮法</div>
-    <div class="bagua">☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷</div>
+    <div class="sub">文王圣卦 · 纳甲筮法<\/div>
+    <div class="bagua">☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷<\/div>
     <p>浴心净手，诚心念你所问之事<br>三枚铜钱，摇六次，得卦象<br>爻动则变，变生万象</p>
     <button class="btn-pri" id="btn-start">起 卦</button>
-  </div>
+  <\/div>
   <div id="page-input" class="page">
-    <div class="p-title">心有所疑</div>
-    <div class="p-sub">默念所问之事，然后摇卦</div>
+    <div class="p-title">心有所疑<\/div>
+    <div class="p-sub">默念所问之事，然后摇卦<\/div>
     <textarea id="q-input" placeholder="在此输入你想问的事情…"></textarea>
     <div class="btn-row">
       <button class="btn-sec" id="btn-back-cover">返回</button>
       <button class="btn-pri" id="btn-start-toss">开始摇卦</button>
-    </div>
-  </div>
+    <\/div>
+  <\/div>
   <div id="page-toss" class="page">
-    <div class="p-title">摇卦中</div>
-    <div class="p-sub" id="toss-hint">第 1 / 6 次</div>
+    <div class="p-title">摇卦中<\/div>
+    <div class="p-sub" id="toss-hint">第 1 / 6 次<\/div>
     <div class="coins-area">
-      <div class="coin" id="c1"><span style="color:#c9942a">☀</span></div>
-      <div class="coin" id="c2"><span style="color:#c9942a">☀</span></div>
-      <div class="coin" id="c3"><span style="color:#c9942a">☀</span></div>
-    </div>
+      <div class="coin" id="c1"><span style="color:#c9942a">☀<\/span><\/div>
+      <div class="coin" id="c2"><span style="color:#c9942a">☀<\/span><\/div>
+      <div class="coin" id="c3"><span style="color:#c9942a">☀<\/span><\/div>
+    <\/div>
     <button class="toss-btn" id="toss-btn">摇 一 次</button>
-    <div class="log" id="toss-log"></div>
-  </div>
+    <div class="log" id="toss-log"><\/div>
+  <\/div>
   <div id="page-hex" class="page">
-    <div class="hex-name" id="hex-name">—</div>
-    <div class="hex-en" id="hex-en"></div>
+    <div class="hex-name" id="hex-name">—<\/div>
+    <div class="hex-en" id="hex-en"><\/div>
     <div class="hex-pair">
-      <span class="hex-arrow">本</span>
-      <span class="hex-sym" id="hex-sym-ben">—</span>
-      <span class="hex-arrow">→</span>
-      <span class="hex-sym" id="hex-sym-bian">—</span>
-      <span class="hex-arrow">变</span>
-    </div>
-    <div class="hex-labels" id="hex-labels"></div>
-    <div class="yao-stack" id="yao-stack"></div>
-    <div class="dong-note" id="dong-note"></div>
-    <div class="gua-desc" id="gua-desc"></div>
+      <span class="hex-arrow">本<\/span>
+      <span class="hex-sym" id="hex-sym-ben">—<\/span>
+      <span class="hex-arrow">→<\/span>
+      <span class="hex-sym" id="hex-sym-bian">—<\/span>
+      <span class="hex-arrow">变<\/span>
+    <\/div>
+    <div class="hex-labels" id="hex-labels"><\/div>
+    <div class="yao-stack" id="yao-stack"><\/div>
+    <div class="dong-note" id="dong-note"><\/div>
+    <div class="gua-desc" id="gua-desc"><\/div>
     <button class="btn-pri" id="btn-interp" style="display:block;margin:0 auto 4px;">解 读 此 卦</button>
     <button class="btn-again" id="btn-again">重新起卦</button>
-  </div>
+  <\/div>
   <div id="page-interp" class="page">
-    <div class="interp-title">卦象解读</div>
+    <div class="interp-title">卦象解读<\/div>
     <div class="qbox">
-      <div class="qlabel">问</div>
-      <div class="qtext" id="q-text"></div>
-    </div>
+      <div class="qlabel">问<\/div>
+      <div class="qtext" id="q-text"><\/div>
+    <\/div>
     <div class="qbox">
-      <div class="qlabel">卦</div>
-      <div class="qtext" id="q-hex"></div>
-    </div>
-    <div class="itext" id="interp-text"></div>
+      <div class="qlabel">卦<\/div>
+      <div class="qtext" id="q-hex"><\/div>
+    <\/div>
+    <div class="itext" id="interp-text"><\/div>
     <button class="btn-again" id="btn-again-interp">重新起卦</button>
-  </div>
-</div>
+  <\/div>
+<\/div>
 <script>
 // ====== 64卦完整数据 ======
 const GUA = {
@@ -281,7 +281,7 @@ function doToss() {
   setTimeout(() => {
     cs.forEach((c, i) => {
       c.classList.remove('toss');
-      c.innerHTML = r[i] ? '<span style="color:#c9942a">☀</span>' : '<span style="color:#7a6a50">☽</span>';
+      c.innerHTML = r[i] ? '<span style="color:#c9942a">☀<\/span>' : '<span style="color:#7a6a50">☽<\/span>';
     });
     let type, yao, dong = false;
     if (p === 3)      { type = '老阳'; yao = '阳'; dong = true; }
@@ -293,7 +293,7 @@ function doToss() {
     const log = document.getElementById('toss-log');
     const item = document.createElement('div');
     item.className = 'log-item';
-    item.innerHTML = `第 ${lines.length} 爻：<span class="s">${type}</span> — ${dong ? '动爻（变）' : '静爻'}`;
+    item.innerHTML = `第 ${lines.length} 爻：<span class="s">${type}<\/span> — ${dong ? '动爻（变）' : '静爻'}`;
     log.appendChild(item);
     const nxt = lines.length + 1;
     if (nxt <= 6) {
@@ -327,13 +327,13 @@ function showHex() {
     const isD = dongIdxs.includes(i);
     const div = document.createElement('div');
     div.className = 'yao-row';
-    div.innerHTML = `<span class="yao-pos">${POS[i]}</span><div class="yao-bar ${lines[i]==='阴'?'yin':''} ${isD?'dong':''}"></div><span>${isD?'⚡':'·'}</span><span>${REL[i]}</span>`;
+    div.innerHTML = `<span class="yao-pos">${POS[i]}<\/span><div class="yao-bar ${lines[i]==='阴'?'yin':''} ${isD?'dong':''}"><\/div><span>${isD?'⚡':'·'}<\/span><span>${REL[i]}<\/span>`;
     stack.appendChild(div);
   }
   const note = document.getElementById('dong-note');
   note.textContent = dongIdxs.length > 0 ? `⚡ 动爻：${dongIdxs.map(i=>POS[i]).join('、')}，变 ${bian.n}` : '静卦无动爻';
   const desc = document.getElementById('gua-desc');
-  desc.innerHTML = `<strong>本卦 ${ben.n}</strong><br>${ben.d}${bian.n!=='变卦'?'<br><br><strong>变卦 '+bian.n+'</strong><br>'+bian.d:''}`;
+  desc.innerHTML = `<strong>本卦 ${ben.n}<\/strong><br>${ben.d}${bian.n!=='变卦'?'<br><br><strong>变卦 '+bian.n+'<\/strong><br>'+bian.d:''}`;
   showPage('hex');
 }
 
