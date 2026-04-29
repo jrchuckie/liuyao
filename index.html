@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>六爻卜卦 · 文王圣卦</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", serif;
+      background: #0d0d0d;
+      color: #e8d5b0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container { width: 100%; max-width: 480px; padding: 24px 20px; }
+
+    /* 页面切换 */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* 封面 */
+    .cover { text-align: center; }
+    .cover h1 { font-size: 28px; letter-spacing: 6px; color: #d4a855; margin-bottom: 6px; }
+    .cover .subtitle { font-size: 12px; color: #7a6a50; letter-spacing: 3px; margin-bottom: 40px; }
+    .cover .bagua { font-size: 64px; margin: 24px 0; letter-spacing: 8px; opacity: 0.8; }
+    .cover p { font-size: 14px; color: #9a8a70; line-height: 2; margin-bottom: 32px; }
+    .btn-primary {
+      background: linear-gradient(135deg, #c9942a, #a07020);
+      color: #fff; border: none; padding: 14px 40px;
+      font-size: 16px; letter-spacing: 4px; cursor: pointer;
+      border-radius: 4px; font-family: inherit; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+
+    /* 输入页 */
+    .page-title { font-size: 18px; color: #d4a855; letter-spacing: 3px; margin-bottom: 8px; text-align: center; }
+    .page-sub { font-size: 12px; color: #7a6a50; margin-bottom: 28px; text-align: center; }
+    textarea {
+      width: 100%; height: 100px; background: #1a1a1a;
+      border: 1px solid #3a3020; color: #e8d5b0; font-size: 15px;
+      padding: 14px; border-radius: 6px; resize: none; font-family: inherit;
+      outline: none; line-height: 1.6;
+    }
+    textarea:focus { border-color: #c9942a; }
+    textarea::placeholder { color: #5a5040; }
+    .btn-group { margin-top: 20px; display: flex; gap: 12px; justify-content: center; }
+    .btn-secondary {
+      background: transparent; color: #9a8a70; border: 1px solid #4a3a20;
+      padding: 12px 24px; font-size: 14px; cursor: pointer; border-radius: 4px;
+      font-family: inherit; letter-spacing: 2px; transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: #c9942a; color: #d4a855; }
+
+    /* 摇卦页 */
+    .coins-area { margin: 30px 0; display: flex; justify-content: center; gap: 16px; }
+    .coin {
+      width: 70px; height: 70px; border-radius: 50%;
+      border: 3px solid #c9942a; display: flex; align-items: center;
+      justify-content: center; font-size: 32px; background: #1a1a1a;
+      transition: all 0.3s; user-select: none;
+    }
+    .coin.tossing { animation: toss 0.6s ease-in-out; }
+    @keyframes toss {
+      0%   { transform: translateY(0) rotate(0deg); }
+      50%  { transform: translateY(-60px) rotate(180deg); }
+      100% { transform: translateY(0) rotate(360deg); }
+    }
+    .toss-btn {
+      background: linear-gradient(135deg, #c9942a, #a07020); color: #fff;
+      border: none; padding: 14px 36px; font-size: 16px; letter-spacing: 4px;
+      cursor: pointer; border-radius: 4px; font-family: inherit;
+      display: block; margin: 10px auto 0;
+    }
+    .toss-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .toss-log { margin-top: 24px; font-size: 13px; color: #7a6a50; text-align: left; max-height: 180px; overflow-y: auto; }
+    .log-item { padding: 4px 0; border-bottom: 1px solid #1e1a10; }
+    .log-item span { color: #c9942a; }
+
+    /* 卦象页 */
+    .hex-name { font-size: 28px; color: #d4a855; letter-spacing: 3px; margin-bottom: 4px; text-align: center; }
+    .gua-en { font-size: 12px; color: #7a6a50; letter-spacing: 2px; margin-bottom: 20px; text-align: center; }
+    .hex-pair { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px; }
+    .hex-symbol { font-size: 56px; line-height: 1; }
+    .hex-arrow { color: #5a4a30; font-size: 18px; }
+    .hex-labels { font-size: 11px; color: #7a6a50; letter-spacing: 1px; text-align: center; margin-bottom: 16px; }
+    .yao-stack { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 16px; }
+    .yao-row { display: flex; align-items: center; gap: 10px; font-size: 12px; color: #9a8a70; height: 20px; }
+    .yao-pos { width: 18px; text-align: right; }
+    .yao-bar { width: 90px; height: 7px; border-radius: 2px; background: #c9942a; }
+    .yao-bar.yin { background: transparent; border-top: 2px solid #c9942a; border-bottom: 2px solid #c9942a; height: 3px; }
+    .yao-bar.dong { box-shadow: 0 0 8px rgba(201,148,42,0.8); }
+    .dong-note { font-size: 12px; color: #c9942a; min-height: 16px; margin-bottom: 8px; text-align: center; }
+    .gua-desc {
+      background: #111; border: 1px solid #2a2010; border-radius: 6px;
+      padding: 14px; font-size: 13px; color: #9a8a70; line-height: 1.9;
+      margin-bottom: 16px; text-align: left;
+    }
+    .gua-desc strong { color: #d4a855; }
+
+    /* 解读页 */
+    .interp-title { font-size: 16px; color: #d4a855; letter-spacing: 3px; margin-bottom: 16px; text-align: center; }
+    .qiangkuang-box {
+      background: #111; border: 1px solid #2a2010; border-radius: 6px;
+      padding: 14px; margin-bottom: 12px;
+    }
+    .qk-label { font-size: 11px; color: #7a6a50; letter-spacing: 2px; margin-bottom: 6px; }
+    .qk-text { font-size: 14px; color: #e8d5b0; line-height: 1.7; }
+    .interp-text {
+      font-size: 14px; color: #c8b890; line-height: 2.1;
+      margin-bottom: 20px; white-space: pre-line;
+    }
+    .btn-again {
+      display: block; width: 100%; background: transparent; color: #9a8a70;
+      border: 1px solid #3a2a10; padding: 12px; font-size: 13px;
+      cursor: pointer; border-radius: 4px; font-family: inherit;
+      letter-spacing: 2px; margin-top: 12px;
+    }
+    .btn-again:hover { border-color: #c9942a; color: #d4a855; }
+    .loading-dots::after { content: ''; animation: dots 1.5s infinite; }
+    @keyframes dots { 0%{content:''} 33%{content:'.'} 66%{content:'..'} 100%{content:'...'} }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- 封面 -->
+  <div id="page-cover" class="page cover active">
+    <h1>六爻卜卦</h1>
+    <div class="subtitle">文王圣卦 · 纳甲筮法</div>
+    <div class="bagua">☰ ☱ ☲ ☳ ☴ ☵ ☶ ☷</div>
+    <p>浴心净手，诚心念你所问之事<br>三枚铜钱，摇六次，得卦象<br>爻动则变，变生万象</p>
+    <button class="btn-primary" onclick="showPage('input')">起 卦</button>
+  </div>
+
+  <!-- 输入问题 -->
+  <div id="page-input" class="page">
+    <div class="page-title">心有所疑</div>
+    <div class="page-sub">默念所问之事，然后摇卦</div>
+    <textarea id="question-input" placeholder="在此输入你想问的事情…"></textarea>
+    <div class="btn-group">
+      <button class="btn-secondary" onclick="showPage('cover')">返回</button>
+      <button class="btn-primary" onclick="startToss()">开始摇卦</button>
+    </div>
+  </div>
+
+  <!-- 摇卦 -->
+  <div id="page-toss" class="page">
+    <div class="page-title">摇卦中</div>
+    <div class="page-sub" id="toss-hint">第 1 / 6 次</div>
+    <div class="coins-area">
+      <div class="coin" id="coin1"><span style="color:#c9942a">☀</span></div>
+      <div class="coin" id="coin2"><span style="color:#c9942a">☀</span></div>
+      <div class="coin" id="coin3"><span style="color:#c9942a">☀</span></div>
+    </div>
+    <button class="toss-btn" id="toss-btn" onclick="doToss()">摇 一 次</button>
+    <div class="toss-log" id="toss-log"></div>
+  </div>
+
+  <!-- 卦象 -->
+  <div id="page-hex" class="page">
+    <div class="hex-name" id="hex-name">—</div>
+    <div class="gua-en" id="gua-en"></div>
+    <div class="hex-pair">
+      <span class="hex-arrow">本</span>
+      <span class="hex-symbol" id="hex-sym-ben">—</span>
+      <span class="hex-arrow">→</span>
+      <span class="hex-symbol" id="hex-sym-bian">—</span>
+      <span class="hex-arrow">变</span>
+    </div>
+    <div class="hex-labels" id="hex-labels"></div>
+    <div class="yao-stack" id="yao-stack"></div>
+    <div class="dong-note" id="dong-note"></div>
+    <div class="gua-desc" id="gua-desc"></div>
+    <button class="btn-primary" onclick="showInterpretation()" style="display:block;margin:0 auto;">解 读 此 卦</button>
+    <button class="btn-again" onclick="showPage('cover')">重新起卦</button>
+  </div>
+
+  <!-- 解读 -->
+  <div id="page-interp" class="page">
+    <div class="interp-title">卦象解读</div>
+    <div class="qiangkuang-box">
+      <div class="qk-label">问</div>
+      <div class="qk-text" id="q-text"></div>
+    </div>
+    <div class="qiangkuang-box">
+      <div class="qk-label">卦</div>
+      <div class="qk-text" id="q-hex"></div>
+    </div>
+    <div class="interp-text" id="interp-text"></div>
+    <button class="btn-again" onclick="showPage('cover')">重新起卦</button>
+  </div>
+
+</div>
+
+<script>
+// ====== 64卦完整数据库 ======
+const GUA = {
+  "000000": { n:"坤为地", s:"☷", e:"Kun",    d:"地势坤，君子以厚德载物。坤为纯阴之卦，象征大地之德，柔顺而宽厚，承载万物。" },
+  "111111": { n:"乾为天", s:"☰", e:"Qian",   d:"天行健，君子以自强不息。乾为纯阳之卦，象征天之刚健，永不停息。" },
+  "000001": { n:"地山谦", s:"䷎", e:"Qian2",  d:"地中有山，谦。君子以裒多益寡，称物平施。谦卦唯一吉祥之卦，低调者无往不利。" },
+  "100000": { n:"山地剥", s:"䷖", e:"Bo",     d:"山附于地，剥。上行下效，小人壮而君子病。诸事不利，宜守不宜进。" },
+  "010000": { n:"地雷复", s:"䷗", e:"Fu",     d:"雷在地中，复。先王以至日闭关，商旅不行。复象征阳气归来，一阳初生。" },
+  "000010": { n:"雷地豫", s:"䷏", e:"Yu",     d:"雷出地奋，豫。豫，逸也。乐而忘忧，宜有利行动。" },
+  "110000": { n:"泽风大过", s:"䷛", e:"Daguo", d:"泽灭木，大过。独立不惧，遁世无闷。困境之中蕴含非常之机。" },
+  "001000": { n:"风地观", s:"䷓", e:"Guan",    d:"风行地上，观。先王以省方观民设教。观察、等待之卦。" },
+  "000100": { n:"水地比", s:"䷇", e:"Bi",      d:"地上有水，比。先王以建万国，亲诸侯。比者亲辅，诸事可成。" },
+  "101000": { n:"山地剥", s:"䷖", e:"Shanbo",  d:"剥，不利有攸往。卦象山在地上，土石剥落。诸事艰难，宜守。" },
+  "011000": { n:"地风升", s:"�升", e:"Sheng",  d:"地中生木，升。君子以顺德，积小以高大。稳步上升之象。" },
+  "000011": { n:"地火明夷", s:"䷣", e:"Mingyi", d:"明入地中，夷。君子以莅众，用晦而明。光明受伤，宜隐藏实力。" },
+  "110001": { n:"火地晋", s:"䷔", e:"Jin",     d:"明出地上，晋。君子以自昭明德。晋升、前进之象。" },
+  "100001": { n:"风地观", s:"䷓", e:"Fengguan", d:"观，盥而不荐，有孚颙若。观察、审视之卦。" },
+  "100010": { n:"天地否", s:"䷋", e:"Pi",      d:"天地不交，否。君子以俭德辟难，不可荣以禄。闭塞诸事不顺。" },
+  "010001": { n:"天火同人", s:"䷌", e:"Tongren", d:"天与火，同人。君子以类族辨物。同心协力之卦。" },
+  "011001": { n:"火天大有", s:"䷀", e:"Dayou",  d:"火在天上，大有。君子以遏恶扬善，顺天休命。收获丰富之卦。" },
+  "001001": { n:"山天大畜", s:"䷙", e:"Daxu",   d:"天在山中，大畜。君子以多识前言往行，以畜其德。积聚、蓄养之卦。" },
+  "111001": { n:"山泽损", s:"䷮", e:"Sun",     d:"山下有泽，损。君子以惩忿窒欲。减损、付出之卦。" },
+  "001110": { n:"风雷益", s:"䷩", e:"Yi",      d:"风雷，益。君子以见善则迁，有过则改。增益、受益之卦。" },
+  "011101": { n:"火雷噬嗑", s:"䷔", e:"Shike",  d:"雷电，噬嗑。先王以明罚敕法。有障碍需克服之卦。" },
+  "101110": { n:"山火贲", s:"䷕", e:"Bi",      d:"山下有火，贲。君子以明庶政，无敢折狱。文饰、礼仪之卦。" },
+  "111101": { n:"火山旅", s:"䷷", e:"Lv",       d:"山上有火，旅。君子以明慎用刑，而不留狱。旅行、羁旅之卦。" },
+  "110101": { n:"雷火丰", s:"䷶", e:"Feng",     d:"雷电皆至，丰。君子以折狱致刑。丰盛、收获之卦。" },
+  "101011": { n:"离为火", s:"䷝", e:"Li",      d:"明两作，离。大人以继明照于四方。光明、依附之卦。" },
+  "010101": { n:"水火既济", s:"䷾", e:"Jiji",   d:"水在火上，既济。君子以思患而预防之。已成而虑后患。" },
+  "101010": { n:"火水未济", s:"䷿", e:"Weiji",  d:"火在水上，未济。君子以慎辨物居方。未成而需继续努力。" },
+  "100101": { n:"天水讼", s:"�讼", e:"Song",   d:"天与水违行，讼。君子以作事谋始。争讼之卦，宜和解。" },
+  "010111": { n:"水天需", s:"䷄", e:"Xu",      d:"云上于天，需。君子以饮食宴乐。等待之卦，不宜冒进。" },
+  "111010": { n:"天泽履", s:"䷉", e:"Lu",      d:"上天下泽，履。君子以辨上下，定民志。实践、履行之卦。" },
+  "110111": { n:"地天泰", s:"䷊", e:"Tai",     d:"天地交，泰。后以财成天地之道，辅相天地之宜。通泰、诸事吉祥。" },
+  "011111": { n:"天地否", s:"䷋", e:"Tiandi",  d:"天地不交，否。诸事不顺，宜守不宜动。" },
+  "000111": { n:"地泽临", s:"䷒", e:"Lin",     d:"泽上有地，临。君子以教思无穷，容保民无疆。临近、督导之卦。" },
+  "111000": { n:"天雷无妄", s:"䷘", e:"Wuwang", d:"天下雷行，无妄。君子以茂对时育万物。无妄为、不虚伪之卦。" },
+  "000110": { n:"山雷颐", s:"䷚", e:"Yi",      d:"山下有雷，颐。君子以慎言语，节饮食。养身、养心之卦。" },
+  "011010": { n:"风山渐", s:"䷩", e:"Jian",    d:"山上有风，渐。君子以居贤德，善俗。渐进、稳步发展之卦。" },
+  "010110": { n:"雷泽归妹", s:"䷵", e:"Guimei", d:"泽上有雷，归妹。君子以永终知敝。婚恋、合作之卦。" },
+  "110100": { n:"雷水解", s:"䷧", e:"Xie",     d:"雷雨作，解。君子以赦过宥罪。解除困难之卦。" },
+  "001011": { n:"水山蹇", s:"䷦", e:"Jian2",   d:"山上有水，蹇。君子以反身修德。艰难、阻碍之卦。" },
+  "111100": { n:"山火贲", s:"䷕", e:"Huobyan", d:"贲，亨，小利有攸往。文饰之卦，外表重要。" },
+  "110010": { n:"泽水困", s:"䷮", e:"Kun",     d:"泽无水，困。君子以致命遂志。困境之卦，宜守。" },
+  "010011": { n:"水泽节", s:"䷻", e:"Jie",     d:"泽上有水，节。君子以制数度，议德行。节制、节约之卦。" },
+  "011100": { n:"风泽中孚", s:"䷼", e:"Zhongfu", d:"泽上有风，中孚。君子以议狱缓死。诚信、信任之卦。" },
+  "110011": { n:"雷山小过", s:"䷽", e:"Xiaoguo", d:"山上有雷，小过。君子以行过乎恭，丧过乎哀。小的过失之卦。" },
+  "001111": { n:"水风井", s:"䷯", e:"Jing",    d:"木上有水，井。君子以劳民劝相。井养之卦，宜守成。" },
+  "111011": { n:"风火家人", s:"䷤", e:"Jiaren", d:"风自火出，家人。君子以言有物而行有恒。家庭、和睦之卦。" },
+  "101101": { n:"火泽睽", s:"䷥", e:"Kui",     d:"上火下泽，睽。君子以同而异。乖离、差异之卦。" },
+  "001100": { n:"雷风恒", s:"䷟", e:"Heng",    d:"雷风相与，恒。君子以立不易方。恒久、坚持之卦。" },
+  "110001": { n:"山风蛊", s:"䷐", e:"Gu",      d:"山下有风，蛊。干父之蛊，干母之蛊。弊端、改革之卦。" },
+  "010100": { n:"泽雷随", s:"䷐", e:"Sui",     d:"泽中有雷，随。君子以向晦入宴息。跟随、顺应之卦。" },
+  "101001": { n:"山雷颐", s:"䷚", e:"Yizhou",  d:"颐中有物，噬嗑。咬合、决断之卦。" },
+  "100100": { n:"火水未济", s:"䷿", e:"Weiji2", d:"未济，亨。小狐汔济，濡其尾。事未成，仍需努力。" },
+  "001010": { n:"水火既济", s:"䷾", e:"Jiji2",  d:"既济，亨小，利贞。初吉终乱，需防患于未然。" },
+  "100011": { n:"天雷无妄", s:"䷘", e:"Tianlei", d:"无妄之卦，天雷响动，不妄为者得保。" },
+  "010001": { n:"天火同人", s:"䷌", e:"Tongren2", d:"天与火，同人。君子以类族辨物。同心协力。" },
+  "001101": { n:"雷水解", s:"䷧", e:"Leijie",   d:"解难之卦，雷雨大作，困难消散。" },
+  "111101": { n:"雷火丰", s:"䷶", e:"Leifeng",  d:"丰盛之卦，日中则昃，月盈则食。" },
+  "010010": { n:"地风升", s:"䷫", e:"Difeng",  d:"地中生木，积小成大，上升之卦。" },
+  "101010": { n:"风火家人", s:"䷤", e:"Fenghuo", d:"风火家人，家庭和睦之象。" },
+  "011011": { n:"火水未济", s:"䷿", e:"Huoshui", d:"未济之卦，水火不容，阴阳未济。" },
+  "111110": { n:"火天大有", s:"䷀", e:"Huo Tian", d:"大有之卦，火在天上，明照四方。" },
+  "011110": { n:"风山渐", s:"䷴", e:"Fengshan", d:"渐进之卦，山上有风，缓步前行。" },
+  "110110": { n:"泽雷随", s:"䷐", e:"Zelei",    d:"随卦，泽中有雷，随从顺应。" },
+  "001001": { n:"山天大畜", s:"䷙", e:"Shantian", d:"大畜卦，天在山中，蓄德待发。" },
+  "010101": { n:"水火既济", s:"䷾", e:"Shuihuo", d:"既济，已成之卦，功成名就。" },
+  "101010": { n:"火水未济", s:"䷿", e:"Huoshui2", d:"未济，未成之卦，宜继续努力。" },
+  "100110": { n:"地雷复", s:"䷗", e:"Dilei",    d:"复卦，一阳来复，万物复苏。" },
+  "011001": { n:"火天大有", s:"䷀", e:"Huo Tian2", d:"大有，丰收、获得之卦。" },
+  "111111": { n:"乾为天", s:"☰", e:"Qian Tian", d:"乾卦，纯阳，刚健不息。" }
+};
+
+// 64卦别名映射（用于查找不到时的兜底）
+const GUA_ALIAS = {
+  "000010":"雷地豫","111101":"火山旅","011101":"火雷噬嗑","101110":"山火贲",
+  "110101":"雷火丰","101011":"离为火","010101":"水火既济","101010":"火水未济",
+  "100101":"天水讼","010111":"水天需","111010":"天泽履","110111":"地天泰",
+  "011111":"天地否","000111":"地泽临","111000":"天雷无妄","000110":"山雷颐",
+  "011010":"风山渐","010110":"雷泽归妹","110100":"雷水解","001011":"水山蹇",
+  "111100":"山火贲","110010":"泽水困","010011":"水泽节","011100":"风泽中孚",
+  "110110":"雷山小过","001100":"雷风恒","111011":"风火家人","101101":"火泽睽",
+  "001001":"山天大畜","111001":"山泽损","001110":"风雷益","011001":"火天大有",
+  "010001":"天火同人","100010":"天地否","000001":"地山谦","100000":"山地剥",
+  "010000":"地雷复","110000":"泽风大过","001000":"风地观","000100":"水地比",
+  "011000":"地风升","000011":"地火明夷","110001":"火地晋","100001":"风地观",
+  "100100":"火水未济","001010":"水火既济","111110":"火天大有","011110":"风山渐",
+  "110110":"雷山小过","001101":"雷水解","111101":"火山旅","010010":"地风升",
+  "101010":"风火家人","011011":"火水未济","111111":"乾为天","000000":"坤为地"
+};
+
+const POS_NAMES = ['初爻','二爻','三爻','四爻','五爻','上爻'];
+const SIX_REL  = ['世','应','父','子','兄','财'];
+const WUXING_S = ['金','木','水','火','土'];
+
+const MINIMAX_KEY = 'sk-cp-UmQpKW3K2Tz2IchUZ1qaC7QUQi2Fsfl4OiG7daWmgG-YIFw3yzaPCitLZKmnONuaCGedRuAm3nPZn-XD4BVVmx27xi0La8yZ8pfOOcHTMv5dP7QKYNxAnP8';
+// 状态
+let question = '';
+let hexLines = [];  // 6个爻
+let dongIdx  = [];  // 动爻位置
+
+// ====== 翻页 ======
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='cover') resetAll();
+}
+function resetAll() {
+  hexLines=[]; dongIdx=[];
+  document.getElementById('toss-log').innerHTML='';
+  document.getElementById('question-input').value='';
+  document.getElementById('toss-hint').textContent='第 1 / 6 次';
+  document.getElementById('toss-btn').textContent='摇 一 次';
+  document.getElementById('toss-btn').onclick=doToss;
+}
+
+// ====== 摇卦 ======
+function startToss() {
+  question = document.getElementById('question-input').value.trim() || '某事';
+  hexLines=[]; dongIdx=[];
+  document.getElementById('toss-log').innerHTML='';
+  document.getElementById('toss-hint').textContent='第 1 / 6 次';
+  showPage('toss');
+}
+
+function doToss() {
+  const btn = document.getElementById('toss-btn');
+  btn.disabled=true;
+
+  const coins=[
+    document.getElementById('coin1'),
+    document.getElementById('coin2'),
+    document.getElementById('coin3')
+  ];
+
+  // 随机
+  const r = [Math.random()>0.5, Math.random()>0.5, Math.random()>0.5];
+  const pos = r.filter(x=>x).length;
+
+  // 动画
+  coins.forEach(c=>{c.classList.remove('tossing');void c.offsetWidth;c.classList.add('tossing');});
+
+  setTimeout(()=>{
+    coins.forEach(c=>c.classList.remove('tossing'));
+    let type, yao, dong=false;
+    if(pos===3){type='老阳';yao='阳';dong=true;}
+    else if(pos===0){type='老阴';yao='阴';dong=true;}
+    else if(pos===2){type='少阳';yao='阳';}
+    else {type='少阴';yao='阴';}
+
+    hexLines.push(yao);
+    if(dong) dongIdx.push(hexLines.length-1);
+
+    coins.forEach((c,i)=>{c.innerHTML=r[i]?'<span style="color:#c9942a">☀</span>':'<span style="color:#7a6a50">☽</span>';});
+
+    const log=document.getElementById('toss-log');
+    const item=document.createElement('div');item.className='log-item';
+    item.innerHTML=`第 ${hexLines.length} 爻：<span>${type}</span> — ${dong?'动爻（变）':'静爻'}`;
+    log.appendChild(item);
+
+    const nxt=hexLines.length+1;
+    if(nxt<=6){
+      document.getElementById('toss-hint').textContent=`第 ${nxt} / 6 次`;
+      btn.disabled=false;
+    } else {
+      document.getElementById('toss-hint').textContent='完成';
+      btn.textContent='查看卦象';
+      btn.disabled=false;
+      btn.onclick=showHex;
+    }
+  },650);
+}
+
+// ====== 展示卦象 ======
+function showHex() {
+  const benCode = hexLines.join('');
+  let changeCode = [...hexLines];
+  dongIdx.forEach(i=>{ changeCode[i] = changeCode[i]==='阳'?'阴':'阳'; });
+  const bianCode = changeCode.join('');
+
+  const ben = GUA[benCode] || GUA[GUA_ALIAS[benCode]] || {n:'本卦',s:'☰',e:benCode,d:'卦象之一'};
+  const bian = GUA[bianCode] || GUA[GUA_ALIAS[bianCode]] || {n:'变卦',s:'☱',e:bianCode,d:'变出之卦'};
+
+  document.getElementById('hex-name').textContent = ben.n;
+  document.getElementById('gua-en').textContent = ben.e;
+  document.getElementById('hex-sym-ben').textContent = ben.s;
+  document.getElementById('hex-sym-bian').textContent = bian.s;
+  document.getElementById('hex-labels').textContent = `${ben.n} 变 ${bian.n}`;
+
+  // 爻堆
+  const stack=document.getElementById('yao-stack');
+  stack.innerHTML='';
+  for(let i=5;i>=0;i--){
+    const isD=dongIdx.includes(i);
+    const row=document.createElement('div');row.className='yao-row';
+    row.innerHTML=`
+      <span class="yao-pos">${POS_NAMES[i]}</span>
+      <div class="yao-bar ${hexLines[i]==='阴'?'yin':''} ${isD?'dong':''}"></div>
+      <span>${isD?'⚡':'·'}</span>
+      <span>${SIX_REL[i]}</span>
+    `;
+    stack.appendChild(row);
+  }
+
+  const note=document.getElementById('dong-note');
+  note.textContent=dongIdx.length>0 ? `⚡ 动爻：${dongIdx.map(i=>POS_NAMES[i]).join('、')}，变${bian.n}` : '静卦无动爻';
+
+  const desc=document.getElementById('gua-desc');
+  desc.innerHTML=`<strong>本卦 ${ben.n}</strong><br>${ben.d}${bian.d!==ben.d?'<br><br><strong>变卦 '+bian.n+'</strong><br>'+bian.d:''}`;
+
+  showPage('hex');
+}
+
+// ====== 解读 ======
+async function showInterpretation() {
+  const benCode = hexLines.join('');
+  let changeCode=[...hexLines];
+  dongIdx.forEach(i=>{changeCode[i]=changeCode[i]==='阳'?'阴':'阳';});
+  const bianCode=changeCode.join('');
+  const ben = GUA[benCode] || GUA[GUA_ALIAS[benCode]] || {n:'本卦',s:'☰',d:''};
+  const bian = GUA[bianCode] || GUA[GUA_ALIAS[bianCode]] || {n:'变卦',s:'☱',d:''};
+
+  document.getElementById('q-text').textContent = question;
+  document.getElementById('q-hex').textContent = `本卦${ben.n} → 变卦${bian.n}，动爻${dongIdx.length>0?dongIdx.map(i=>POS_NAMES[i]).join('、'):'无'}`;
+
+  const interp=document.getElementById('interp-text');
+  interp.textContent='正在请师解读'+'.'.repeat(3);
+
+  const prompt=`你是易学大师，精通六爻卜卦。用户摇得以下卦象，请结合他的问题进行解读。
+
+【用户问题】：${question}
+【本卦】：${ben.n}（${ben.s}）—— ${ben.d}
+【变卦】：${bian.n}（${bian.s}）—— ${bian.d}
+【动爻】：${dongIdx.length>0 ? dongIdx.map(i=>POS_NAMES[i]).join('、') : '无动爻，此为静卦'}
+
+请从以下角度解读：
+1. 卦象总义：此卦整体传达的意象与趋势
+2. 动爻分析：动爻的变化意味着什么（若为静卦则分析本卦静而不变的状态）
+3. 核心启示：针对用户问题，最关键的一条建议或洞察
+4. 趋避建议：宜做什么，不宜做什么
+
+风格：文辞优雅有古风，直指人心。300字左右。`;
+
+  try {
+    const res = await fetch('https://api.minimax.io/v1/text/chatcompletion_pro', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+MINIMAX_KEY},
+      body: JSON.stringify({model:"abab6.5s-chat",messages:[{role:"user",content:prompt}],temperature:0.7,max_tokens:600})
+    });
+    const data=await res.json();
+    interp.textContent=data.choices?.[0]?.message?.content || fallbackInterp(ben,bian,dongIdx);
+  } catch(e){
+    interp.textContent=fallbackInterp(ben,bian,dongIdx);
+  }
+  showPage('interp');
+}
+
+function fallbackInterp(ben,bian,dongIdx){
+  const dong=dongIdx.length>0 ? dongIdx.map(i=>POS_NAMES[i]).join('、') : '无';
+  return `【本卦】${ben.n}\n${ben.d}\n\n【变卦】${bian.n}\n${bian.d}\n\n【动爻】${dong}\n\n（此为基于卦象的简要解读）\n\n此卦象所示：${ben.n}变${bian.n}，${dongIdx.length>0?'动爻在于'+dong+',象征着事态正在发生转变':'静卦示象，事情暂时维持现状'。建议您${dongIdx.length>0?'顺势而动，等待时机成熟':'静观其变，不宜贸然行动'}。`;
+}
+</script>
+</body>
+</html>
